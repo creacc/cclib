@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">CCList</string>
+    <string name="adapter_tag_view">adapter_tag_view</string>
+</resources>
