@@ -4,6 +4,165 @@
 
 ### ccdao --- 数据库框架
 
+    /**
+     * Created by Creacc on 2016/6/15.
+     */
+    @CCTableEntity(name = "women_table", rule = CCTableEntity.INCLUDE)
+    public class WomenEntity {
+    
+        @CCColumn
+        private int id;
+    
+        @CCColumn
+        private String name;
+    
+        /**
+         * 由于table的rule为INCLUDE，所以不进行CCColumn标注的field将不会加入table中
+         */
+        private int age;
+    }
+
+    /**
+     * CCTableEntity中rule默认为EXCLUDE
+     *
+     * Created by Creacc on 2016/6/15.
+     */
+    @CCTableEntity(name = "men_table")
+    public class MenEntity {
+    
+        /**
+         * CCKeyColumn中increment默认为false，表示key不自增
+         */
+        @CCKeyColumn(increment = true)
+        private int id;
+        
+        /**
+         * CCColumn的name默认会使用field名称
+         */
+        @CCColumn(name = "person_name")
+        private String name;
+        
+        /**
+         * 由于CCTableEntity的rule为EXCLUDE，所以即使不进行CCColumn标注，该field也会加入table
+         */
+        private double height;
+        
+        /**
+         * 当CCTableEntity的rule为EXCLUDE时，进行CCTableExcludeColumn标注的field将不会加入table
+         */
+        @CCTableExcludeColumn
+        private boolean isBadGuy;
+    }
+    
+    public class PointResolver extends CCColumnResolver<Point> {
+    
+        /**
+         * 默认构造器
+         *
+         * @param name 数据库列名
+         */
+        public PointResolver(String name) {
+            super(name);
+        }
+    
+        @Override
+        public String columnType() {
+            return "text";
+        }
+    
+        @Override
+        protected void innerSerialize(ContentValues values, String key, Point value) {
+            values.put(key, new Gson().toJson(value));
+        }
+    
+        @Override
+        protected Point innerDeserialize(Cursor cursor, int index) {
+            return new Gson().fromJson(cursor.getString(index), Point.class);
+        }
+    
+        @Override
+        public String getWhereArgument(Point value) {
+            return new Gson().toJson(value);
+        }
+    }
+    
+    /**
+     * CCDaoEntity的name和version均为选填
+     * name默认采用table的名称
+     * version默认为1
+     *
+     * Created by Creacc on 2016/6/15.
+     */
+    @CCDaoEntity(name = "self_dao", version = 2)
+    @CCTableEntity(name = "self_table")
+    public class SelfEntity {
+    
+        @CCKeyColumn
+        private int id;
+    
+        private String name;
+    
+        @CCWhere(key = 1)
+        private String address;
+    
+        @CCWhere(key = 2)
+        private int year;
+    
+        @CCWhere(key = 2)
+        private int month;
+    
+        @CCColumn(serializer = PointResolver.class)
+        private Point position;
+    
+        public int getId() {
+            return id;
+        }
+    
+        public void setId(int id) {
+            this.id = id;
+        }
+    
+        public String getName() {
+            return name;
+        }
+    
+        public void setName(String name) {
+            this.name = name;
+        }
+    
+        public String getAddress() {
+            return address;
+        }
+    
+        public void setAddress(String address) {
+            this.address = address;
+        }
+    
+        public int getYear() {
+            return year;
+        }
+    
+        public void setYear(int year) {
+            this.year = year;
+        }
+    
+        public int getMonth() {
+            return month;
+        }
+    
+        public void setMonth(int month) {
+            this.month = month;
+        }
+    
+        public Point getPosition() {
+            return position;
+        }
+    
+        public void setPosition(Point position) {
+            this.position = position;
+        }
+    }
+    
     public void test(Context context) {
 
         String dir = Environment.getExternalStorageDirectory().getPath();
