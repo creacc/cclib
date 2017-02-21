@@ -1,4 +1,4 @@
-package com.creacc.ccdao;
+package com.creacc.ccdao.annotation;
 
 import com.creacc.ccdao.resolver.CCColumnResolver;
 

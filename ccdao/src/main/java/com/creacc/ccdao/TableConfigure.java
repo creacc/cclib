@@ -3,6 +3,13 @@ package com.creacc.ccdao;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
+import com.creacc.ccdao.annotation.CCColumn;
+import com.creacc.ccdao.annotation.CCOrder;
+import com.creacc.ccdao.annotation.CCTableEntity;
+import com.creacc.ccdao.annotation.CCTableExcludeColumn;
+import com.creacc.ccdao.annotation.CCWhere;
+import com.creacc.ccdao.exception.CCDaoArgumentException;
+
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,33 +26,56 @@ class TableConfigure {
 
     public String dropSQL;
 
-    public String tableName;
+    public String countSQL;
 
-    public int tableRule;
+    public String tableName;
 
     public Map<Field, ColumnConfigure> fieldMap;
 
     public SparseArray<WhereCase> whereCases;
 
-    private TableConfigure(String name, int rule, Map<Field, ColumnConfigure> map) {
-        createSQL = String.format("create table if not exists %s(%s);", tableName, getColumnSQL(map.values()));
-        dropSQL = String.format("drop table %s;", tableName);
+    public SparseArray<OrderCase> orderCases;
+
+    public Class<? extends CCUpgrader>[] tableUpgraders;
+
+    private TableConfigure(String name, Map<Field, ColumnConfigure> map, SparseArray<WhereCase> wheres, SparseArray<OrderCase> orders, Class<? extends CCUpgrader>[] upgraders) {
+        createSQL = String.format("create table if not exists %s(%s)", name, getColumnSQL(map.values()));
+        dropSQL = String.format("drop table %s", name);
+        countSQL = String.format("select count(*) from %s", name);
         tableName = name;
-        tableRule = rule;
         fieldMap = map;
+        whereCases = wheres;
+        orderCases = orders;
+        tableUpgraders = upgraders;
     }
 
     @NonNull
     public static TableConfigure generateConfigure(Class entityClass) {
         CCTableEntity tableAnnotation = (CCTableEntity) entityClass.getAnnotation(CCTableEntity.class);
-        String tableName = tableAnnotation.name();
         int tableRule = tableAnnotation.rule();
+        String tableName = tableAnnotation.name();
         HashMap<Field, ColumnConfigure> columnMap = new HashMap<Field, ColumnConfigure>();
-        SparseArray<WhereCase> whereCases = new SparseArray<>();
-        ColumnConfigure configure = null;
+        SparseArray<WhereCase> whereCases = new SparseArray<WhereCase>();
+        SparseArray<OrderCase> orderCases = new SparseArray<OrderCase>();
+        while (true) {
+            analyse(entityClass, tableRule, columnMap, whereCases, orderCases);
+            Class superclass = entityClass.getSuperclass();
+            if (superclass.isAnnotationPresent(CCTableEntity.class)) {
+                entityClass = superclass;
+                tableAnnotation = (CCTableEntity) entityClass.getAnnotation(CCTableEntity.class);
+                tableRule = tableAnnotation.rule();
+            } else {
+                break;
+            }
+        }
+        return new TableConfigure(tableName, columnMap, whereCases, orderCases, tableAnnotation.upgraders());
+    }
+
+    private static void analyse(Class entityClass, int tableRule, HashMap<Field, ColumnConfigure> columnMap, SparseArray<WhereCase> whereCases, SparseArray<OrderCase> orderCases) {
         for (Field field : entityClass.getDeclaredFields()) {
+            ColumnConfigure configure = null;
             if (tableRule == CCTableEntity.EXCLUDE) {
-                if (field.isAnnotationPresent(CCTableExcludeColumn.class) == false) {
+                if (field.isAnnotationPresent(CCTableExcludeColumn.class)) {
                     continue;
                 }
                 if (field.isAnnotationPresent(CCColumn.class)) {
@@ -59,28 +89,39 @@ class TableConfigure {
                 }
             }
             if (configure != null) {
-                if (configure.isKey()) {
-                    whereCases.put(DEFAULT_UPDATE_KEY, new WhereCase(configure));
-                }
-                if (field.isAnnotationPresent(CCWhere.class)) {
-                    CCWhere whereAnno = field.getAnnotation(CCWhere.class);
-                    int key = whereAnno.key();
-                    if (key > DEFAULT_UPDATE_KEY) {
-                        WhereCase whereCase = whereCases.get(key);
-                        if (whereCase == null) {
-                            whereCase = new WhereCase();
-                            whereCases.put(key, whereCase);
-                        }
-                        whereCase.push(configure);
-                    } else {
-                        throw new CCDaoException("The update key must be an integer which is not equal to " + DEFAULT_UPDATE_KEY);
-                    }
-                }
+                parseWhereCauses(whereCases, field, configure);
+                parseOrderColumn(orderCases, field, configure);
                 field.setAccessible(true);
                 columnMap.put(field, configure);
             }
         }
-        return new TableConfigure(tableName, tableRule, columnMap);
+    }
+
+    private static void parseWhereCauses(SparseArray<WhereCase> whereCases, Field field, ColumnConfigure configure) {
+        if (configure.isKey()) {
+            whereCases.put(DEFAULT_UPDATE_KEY, new WhereCase(configure));
+        }
+        if (field.isAnnotationPresent(CCWhere.class)) {
+            CCWhere whereAnno = field.getAnnotation(CCWhere.class);
+            int key = whereAnno.key();
+            if (key > DEFAULT_UPDATE_KEY) {
+                WhereCase whereCase = whereCases.get(key);
+                if (whereCase == null) {
+                    whereCase = new WhereCase();
+                    whereCases.put(key, whereCase);
+                }
+                configure.whereOperator = whereAnno.operator();
+                whereCase.push(configure);
+            } else {
+                throw new CCDaoArgumentException("The update key must be an integer which is bigger than " + DEFAULT_UPDATE_KEY);
+            }
+        }
+    }
+
+    private static void parseOrderColumn(SparseArray<OrderCase> orderCase, Field field, ColumnConfigure configure) {
+        if (field.isAnnotationPresent(CCOrder.class)) {
+            orderCase.put((field.getAnnotation(CCOrder.class)).key(), new OrderCase(configure));
+        }
     }
 
     @NonNull

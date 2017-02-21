@@ -36,7 +36,7 @@ public class ByteResolver extends CCColumnResolver<Byte> {
     }
 
     @Override
-    public String getStringValue(Byte value) {
+    public String getWhereArgument(Byte value) {
         return Byte.toString(value);
     }
 }

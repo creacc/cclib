@@ -38,7 +38,7 @@ public class ByteArrayResolver extends CCColumnResolver<byte[]> {
     }
 
     @Override
-    public String getStringValue(byte[] value) {
+    public String getWhereArgument(byte[] value) {
         return Arrays.toString(value);
     }
 }

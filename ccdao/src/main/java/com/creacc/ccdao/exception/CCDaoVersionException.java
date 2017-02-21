@@ -1,4 +1,4 @@
-package com.creacc.ccdao;
+package com.creacc.ccdao.exception;
 
 /**
  * 当数据库版本小于或等于0时，抛出此异常<br/>

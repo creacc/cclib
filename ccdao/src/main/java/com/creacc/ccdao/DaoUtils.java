@@ -1,9 +1,15 @@
 package com.creacc.ccdao;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
+
+import com.creacc.ccdao.exception.CCDaoArgumentException;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,7 +59,7 @@ class DaoUtils {
         try {
             WhereCase whereCase = table.whereCases.get(key);
             if (whereCase == null) {
-                throw new CCDaoException("The update key is not declared");
+                throw new CCDaoArgumentException("The update key is not declared");
             } else {
                 ContentValues contentValues = new ContentValues();
                 for (Map.Entry<Field, ColumnConfigure> entry : table.fieldMap.entrySet()) {
@@ -78,7 +84,7 @@ class DaoUtils {
         try {
             WhereCase whereCase = table.whereCases.get(key);
             if (whereCase == null) {
-                throw new CCDaoException("The update key is not declared");
+                throw new CCDaoArgumentException("The update key is not declared");
             } else {
                 ContentValues contentValues = new ContentValues();
                 for (Map.Entry<Field, ColumnConfigure> entry : table.fieldMap.entrySet()) {
@@ -97,4 +103,64 @@ class DaoUtils {
             dao.unlockWrite(database);
         }
     }
+
+    static int queryCount(CCDaoContext dao, TableConfigure table) {
+        return queryCount(dao, table, null, null);
+    }
+
+    static int queryCount(CCDaoContext dao, TableConfigure table, String whereCause, String[] whereArgs) {
+        SQLiteDatabase database = dao.lockRead();
+        Cursor cursor = null;
+        try {
+            String rawSQL = table.countSQL;
+            if (TextUtils.isEmpty(whereCause) == false) {
+                rawSQL += " " + whereCause;
+            }
+            cursor = database.rawQuery(rawSQL, whereArgs);
+            if (cursor.moveToNext()) {
+                return (int) cursor.getLong(0);
+            }
+            return 0;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            dao.unlockRead(database);
+        }
+    }
+
+    static <T> List<T> query(CCDaoContext dao, TableConfigure table, EntityInstanceGenerator<T> generator) {
+        return query(dao, table, generator, null, null, null, null);
+    }
+
+    static <T> List<T> query(CCDaoContext dao, TableConfigure table, EntityInstanceGenerator<T> generator, String whereCause, String[] whereArgs, String order, String limit) {
+        SQLiteDatabase database = dao.lockRead();
+        Cursor cursor = null;
+        try {
+            cursor = database.query(table.tableName, null, whereCause,
+                    whereArgs, null, null, order, limit);
+            List<T> result = new ArrayList<T>();
+            while (cursor.moveToNext()) {
+                T entity = generator.generateInstance();
+                for (ColumnConfigure columnConfigure : table.fieldMap.values()) {
+                    int columnIndex = cursor.getColumnIndex(columnConfigure.columnName);
+                    if (columnIndex >= 0) {
+                        try {
+                            columnConfigure.columnField.set(entity, columnConfigure.columnResolver.deserialize(cursor));
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                result.add(entity);
+            }
+            return result;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            dao.unlockRead(database);
+        }
+    }
+
 }

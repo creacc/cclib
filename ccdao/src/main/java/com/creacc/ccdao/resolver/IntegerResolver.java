@@ -30,7 +30,7 @@ public class IntegerResolver extends CCColumnResolver<Integer> {
     }
 
     @Override
-    public String getStringValue(Integer value) {
+    public String getWhereArgument(Integer value) {
         return Integer.toString(value);
     }
 

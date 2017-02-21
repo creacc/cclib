@@ -1,4 +1,4 @@
-package com.creacc.ccdao;
+package com.creacc.ccdao.annotation;
 
 /**
  * 用于标识该成员不导入数据库<br/>

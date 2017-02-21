@@ -1,4 +1,6 @@
-package com.creacc.ccdao;
+package com.creacc.ccdao.annotation;
+
+import com.creacc.ccdao.exception.CCDaoVersionException;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

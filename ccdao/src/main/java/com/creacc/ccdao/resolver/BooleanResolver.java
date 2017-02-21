@@ -36,7 +36,7 @@ public class BooleanResolver extends CCColumnResolver<Boolean> {
     }
 
     @Override
-    public String getStringValue(Boolean value) {
+    public String getWhereArgument(Boolean value) {
         return value ? "1" : "0";
     }
 }

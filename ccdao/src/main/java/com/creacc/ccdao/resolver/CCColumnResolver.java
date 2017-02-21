@@ -109,5 +109,5 @@ public abstract class CCColumnResolver<T> {
      */
     protected abstract T innerDeserialize(Cursor cursor, int index);
 
-    public abstract String getStringValue(T value);
+    public abstract String getWhereArgument(T value);
 }

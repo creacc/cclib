@@ -36,7 +36,7 @@ public class DoubleResolver extends CCColumnResolver<Double> {
     }
 
     @Override
-    public String getStringValue(Double value) {
+    public String getWhereArgument(Double value) {
         return Double.toString(value);
     }
 }

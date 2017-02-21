@@ -36,7 +36,7 @@ public class LongResolver extends CCColumnResolver<Long> {
     }
 
     @Override
-    public String getStringValue(Long value) {
+    public String getWhereArgument(Long value) {
         return Long.toString(value);
     }
 }

@@ -1,6 +1,8 @@
-package com.creacc.ccdao;
+package com.creacc.ccdao.annotation;
 
 import android.support.annotation.IntDef;
+
+import com.creacc.ccdao.CCUpgrader;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -30,7 +32,9 @@ public @interface CCTableEntity {
     /**
      * 数据库表名称
      */
-    String name();
+    String name() default "";
+
+    Class<? extends CCUpgrader>[] upgraders() default CCUpgrader.class;
 
     /**
      *  用于标识将{@link CCTableEntity}中成员导入数据库的规则<br/>

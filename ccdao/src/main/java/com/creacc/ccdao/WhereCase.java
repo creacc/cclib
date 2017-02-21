@@ -13,7 +13,7 @@ import java.util.List;
 
 class WhereCase {
 
-    private List<ColumnConfigure> mWhereColumns = new ArrayList<>();
+    private List<ColumnConfigure> mWhereColumns = new ArrayList<ColumnConfigure>();
 
     private String mWhereClause;
 
@@ -39,7 +39,8 @@ class WhereCase {
 
                 @Override
                 public String getValue(int index) {
-                    return mWhereColumns.get(index).columnName + "=?";
+                    ColumnConfigure columnConfigure = mWhereColumns.get(index);
+                    return columnConfigure.columnName + columnConfigure.whereOperator + "?";
                 }
             });
         }
@@ -58,7 +59,7 @@ class WhereCase {
                 ColumnConfigure configure = mWhereColumns.get(index);
                 try {
                     Object value = configure.columnField.get(object);
-                    return configure.columnResolver.getStringValue(value);
+                    return configure.columnResolver.getWhereArgument(value);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }

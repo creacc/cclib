@@ -4,6 +4,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.creacc.ccdao.annotation.CCColumn;
+import com.creacc.ccdao.annotation.CCKeyColumn;
 import com.creacc.ccdao.resolver.CCColumnResolver;
 
 import java.lang.reflect.Field;
@@ -27,6 +29,8 @@ class ColumnConfigure {
     public CCColumnResolver columnResolver;
 
     public int columnFlag;
+
+    public String whereOperator;
 
     private ColumnConfigure(String name, Field field, CCColumnResolver resolver) {
         columnName = name;

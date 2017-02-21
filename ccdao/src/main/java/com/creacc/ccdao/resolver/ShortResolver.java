@@ -36,7 +36,7 @@ public class ShortResolver extends CCColumnResolver<Short> {
     }
 
     @Override
-    public String getStringValue(Short value) {
+    public String getWhereArgument(Short value) {
         return Short.toString(value);
     }
 }

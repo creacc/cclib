@@ -31,7 +31,7 @@ public class FloatResolver extends CCColumnResolver<Float> {
     }
 
     @Override
-    public String getStringValue(Float value) {
+    public String getWhereArgument(Float value) {
         return Float.toString(value);
     }
 }

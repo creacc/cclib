@@ -36,7 +36,7 @@ public class StringResolver extends CCColumnResolver<String> {
     }
 
     @Override
-    public String getStringValue(String value) {
+    public String getWhereArgument(String value) {
         return value;
     }
 }
