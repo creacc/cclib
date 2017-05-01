@@ -1,1 +1,1 @@
-include ':app', ':ccbox', ':cclistview', ':ccnio', ':ccdao', ':ccdrag'
+include ':app', ':ccbox', ':cclistview', ':ccnio', ':ccdao', ':ccdrag', ':ccdaolite'

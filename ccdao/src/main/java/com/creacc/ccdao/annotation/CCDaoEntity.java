@@ -1,6 +1,6 @@
 package com.creacc.ccdao.annotation;
 
-import com.creacc.ccdao.exception.CCDaoVersionException;
+import com.creacc.ccdao.exception.CCDaoInitializeException;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,7 +24,7 @@ public @interface CCDaoEntity {
 
     /**
      * 数据库版本，默认为1
-     * @throws CCDaoVersionException 当数据库版本小于或等于0时，抛出此异常
+     * @throws CCDaoInitializeException 当数据库版本小于或等于0时，抛出此异常
      */
     int version() default 1;
 }

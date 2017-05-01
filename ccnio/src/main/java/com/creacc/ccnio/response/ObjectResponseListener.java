@@ -1,7 +1,6 @@
 package com.creacc.ccnio.response;
 
-import com.creacc.box.nio.RequestListener;
-import com.example.administrator.community.Utils.UIUtils;
+import com.creacc.ccnio.RequestListener;
 
 /**
  * Created by Administrator on 2016/3/6.
@@ -15,7 +14,6 @@ public abstract class ObjectResponseListener<ResultType> implements RequestListe
         if (result.isSuccess()) {
             onRequestComplete(true, result.getResultEntity());
         } else {
-            UIUtils.showToast(result.getMessage());
             onRequestComplete(false, null);
         }
     }

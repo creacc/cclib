@@ -1,6 +1,6 @@
 package com.creacc.ccnio.response;
 
-import com.creacc.box.utils.JsonUtils;
+import com.creacc.ccbox.utils.JsonUtils;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;

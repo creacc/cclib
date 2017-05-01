@@ -36,6 +36,9 @@ public class CCDao {
      * @param version 数据库版本
      */
     public CCDao(Context context, String path, int version) {
+        if (version <= 0) {
+            throw new CCDaoInitializeException("Database version must more than 0");
+        }
         mContext = context;
         mPath = path;
         mVersion = version;
@@ -51,6 +54,13 @@ public class CCDao {
             public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
                 for (CCTable table : mTables) {
                     table.upgrade(db, oldVersion, newVersion);
+                }
+            }
+
+            @Override
+            public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+                for (CCTable table : mTables) {
+                    table.downgrade(db, oldVersion, newVersion);
                 }
             }
         };

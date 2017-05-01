@@ -87,7 +87,11 @@ public class CCTable<T> {
         DaoUtils.createTable(mDaoContext, mTableConfigure);
     }
 
-    void upgrade(SQLiteDatabase database, int originalVersion, int finalVersion) {
+    protected void upgrade(SQLiteDatabase database, int originalVersion, int finalVersion) {
+
+    }
+
+    protected void downgrade(SQLiteDatabase database, int originalVersion, int finalVersion) {
 
     }
 

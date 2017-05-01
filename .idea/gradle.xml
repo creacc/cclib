@@ -11,11 +11,13 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/ccbox" />
             <option value="$PROJECT_DIR$/ccdao" />
+            <option value="$PROJECT_DIR$/ccdaolite" />
             <option value="$PROJECT_DIR$/ccdrag" />
             <option value="$PROJECT_DIR$/cclistview" />
             <option value="$PROJECT_DIR$/ccnio" />
           </set>
         </option>
+        <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
   </component>
