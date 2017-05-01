@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">CCList</string>
-    <string name="adapter_tag_view">adapter_tag_view</string>
+
+    <!--adapter-->
+    <string name="le_adapter_holder_tag_key">le_adapter_holder_tag_key</string>
+    <string name="le_adapter_holder_index_tag_key">le_adapter_holder_index_tag_key</string>
+
 </resources>
